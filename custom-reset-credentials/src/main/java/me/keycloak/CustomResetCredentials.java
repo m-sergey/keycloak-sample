@@ -3,11 +3,10 @@ package me.keycloak;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialModel;
-import org.keycloak.models.UserModel;
+import org.keycloak.models.*;
 import org.keycloak.models.utils.KeycloakModelUtils;
+import org.keycloak.policy.PasswordPolicyManagerProvider;
+import org.keycloak.policy.PolicyError;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,8 +77,14 @@ public class CustomResetCredentials implements Authenticator {
 
         LOG.info("Found {} attributes of {}", values.size(), username);
 
-        if (values.size() == 1 && values.get(0).equals(secretAnswer)) {
+        var policyManagerProvider = context.getSession().getProvider(PasswordPolicyManagerProvider.class);
+        PolicyError error = policyManagerProvider.validate(context.getRealm(), user, newPassword);
+
+        if (values.size() == 1
+                && values.get(0).equals(secretAnswer)
+                && error == null) {
             credManager.updateCredential(context.getRealm(), user, UserCredentialModel.password(newPassword));
+            LOG.info("Password was updated for {} ", username);
             context.success();
         } else {
             context.failureChallenge(

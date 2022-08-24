@@ -5,6 +5,8 @@ import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.models.*;
 
+import org.keycloak.policy.PasswordPolicyManagerProvider;
+import org.keycloak.policy.PolicyError;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +55,10 @@ public class CustomSetCredentials implements Authenticator {
         boolean isCorrectPass = credManager.isValid(context.getRealm(), context.getUser(), UserCredentialModel.password(currentPassword));
         LOG.info("Result for {} is {}", context.getUser().getUsername(), isCorrectPass);
 
-        if(isCorrectPass) {
+        var policyManagerProvider = context.getSession().getProvider(PasswordPolicyManagerProvider.class);
+        PolicyError error = policyManagerProvider.validate(context.getRealm(), context.getUser(), newPassword);
+
+        if(isCorrectPass && error == null) {
             credManager.updateCredential(context.getRealm(), context.getUser(), UserCredentialModel.password(newPassword));
             context.success();
         } else {
