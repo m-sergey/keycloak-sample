@@ -9,10 +9,16 @@ services:
       - POSTGRES_PASSWORD=keycloak
     ports:
       - 5432:5432
-  
+
+  mail:
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025
+      - 8025:8025
+
   keycloak:
     image: quay.io/keycloak/keycloak:18.0
-    command: start-dev
+    command: start-dev --import-realm
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
@@ -26,6 +32,7 @@ services:
       - KC_HOSTNAME=localhost
     volumes:
       - ./providers:/opt/keycloak/providers
+      - ./import:/opt/keycloak/data/import
     ports:
       - 8080:8080
       - 8443:8443
