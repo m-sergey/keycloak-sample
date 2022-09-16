@@ -3,11 +3,14 @@ package me.keycloak;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
+import org.keycloak.jose.jws.JWSInput;
+import org.keycloak.jose.jws.JWSInputException;
 import org.keycloak.models.*;
 
+import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.policy.PasswordPolicyManagerProvider;
 import org.keycloak.policy.PolicyError;
-import org.keycloak.services.managers.AuthenticationManager;
+import org.keycloak.representations.JsonWebToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,24 +20,47 @@ public class CustomSetCredentials implements Authenticator {
 
     private static final String TPL_CODE = "custom-set-credentials.ftl";
 
+    private static final String AUDIENCE = "reset-password";
+
     @Override
     public void authenticate(AuthenticationFlowContext context) {
         LOG.info("CustomSetCredentials authenticate");
-        AuthenticationManager.AuthResult authResult = AuthenticationManager.authenticateIdentityCookie(context.getSession(),
-                context.getRealm(), true);
 
-        if (authResult == null) {
-            LOG.info("CustomSetCredentials unauthenticated");
-            context.attempted();
-        } else {
+        var session = context.getSession();
+        var request = context.getSession().getContext().getUri();
+        var params = request.getQueryParameters(true);
+        var subjectToken = params.getFirst("token");
+
+        try {
+            JWSInput jws = new JWSInput(subjectToken);
+            JsonWebToken jwt = jws.readJsonContent(JsonWebToken.class);
+
+            if(!AUDIENCE.equals(jwt.getAudience()[0])) {
+                LOG.info("CustomSetCredentials unauthenticated (incorrect aud)");
+                context.attempted();
+                return;
+            }
+
+            var user = session.users().getUserById(context.getRealm(), jwt.getSubject());
+
+            if (user == null) {
+                LOG.info("CustomSetCredentials unauthenticated (user not found)");
+                context.attempted();
+                return;
+            }
+
             LOG.info("CustomSetCredentials authenticated");
-            context.setUser(authResult.getUser());
+            context.setUser(user);
 
             context.challenge(
                     context.form()
                             .setAttribute("realm", context.getRealm())
                             .createForm(TPL_CODE)
             );
+        } catch (JWSInputException e) {
+            LOG.error("CustomSetCredentials: {} \n {}", e.getMessage(), e.fillInStackTrace());
+            context.attempted();
+            return;
         }
     }
 
