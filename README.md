@@ -29,4 +29,6 @@ curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/op
 
 Open URL in browser:
 
-http://localhost:8080/realms/Clients/login-actions/reset-credentials?client_id=accounts&tab_id=71G202wijnE&test=sample&token=<reset-password token>
+```
+http://localhost:8080/realms/Clients/login-actions/reset-credentials?client_id=accounts&token=<reset-password token>
+```
