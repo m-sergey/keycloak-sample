@@ -24,3 +24,9 @@ curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/op
 --data-urlencode 'subject_token=???' \
 --data-urlencode 'requested_token_type=urn:ietf:params:oauth:token-type:access_token'
 ````
+
+## Set new password
+
+Open URL in browser:
+
+http://localhost:8080/realms/Clients/login-actions/reset-credentials?client_id=accounts&tab_id=71G202wijnE&test=sample&token=<reset-password token>
