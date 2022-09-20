@@ -3,6 +3,10 @@ package me.keycloak;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
+import org.keycloak.common.VerificationException;
+import org.keycloak.crypto.SignatureProvider;
+import org.keycloak.crypto.SignatureVerifierContext;
+import org.keycloak.exceptions.TokenSignatureInvalidException;
 import org.keycloak.jose.jws.JWSInput;
 import org.keycloak.jose.jws.JWSInputException;
 import org.keycloak.models.*;
@@ -13,6 +17,8 @@ import org.keycloak.policy.PolicyError;
 import org.keycloak.representations.JsonWebToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.UnsupportedEncodingException;
 
 public class CustomSetCredentials implements Authenticator {
 
@@ -33,7 +39,23 @@ public class CustomSetCredentials implements Authenticator {
 
         try {
             JWSInput jws = new JWSInput(subjectToken);
+            var headers = jws.getHeader();
+
+            SignatureVerifierContext signatureVerifier = session.getProvider(SignatureProvider.class, headers.getAlgorithm().name()).verifier(headers.getKeyId());
+
+            if (!signatureVerifier.verify(jws.getEncodedSignatureInput().getBytes("UTF-8"), jws.getSignature())) {
+                LOG.info("CustomSetCredentials unauthenticated (invalid signature)");
+                context.attempted();
+                return;
+            }
+
             JsonWebToken jwt = jws.readJsonContent(JsonWebToken.class);
+
+            if(!jwt.isActive()) {
+                LOG.info("CustomSetCredentials unauthenticated (expired token)");
+                context.attempted();
+                return;
+            }
 
             if(!AUDIENCE.equals(jwt.getAudience()[0])) {
                 LOG.info("CustomSetCredentials unauthenticated (incorrect aud)");
@@ -57,7 +79,7 @@ public class CustomSetCredentials implements Authenticator {
                             .setAttribute("realm", context.getRealm())
                             .createForm(TPL_CODE)
             );
-        } catch (JWSInputException e) {
+        } catch (JWSInputException | VerificationException | UnsupportedEncodingException e) {
             LOG.error("CustomSetCredentials: {} \n {}", e.getMessage(), e.fillInStackTrace());
             context.attempted();
             return;
