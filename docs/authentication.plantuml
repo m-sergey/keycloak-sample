@@ -1,0 +1,37 @@
+@startuml
+autonumber
+
+actor Пользователь as user
+participant "Web app" as app
+participant Keycloak as keycloak
+participant Микросервис as service
+
+== Аутентификация с Proof Key for Code Exchange (PKCE) ==
+user -> app : Запрос аутентификации
+app --> user : Редирект на страницу\n аутентификации Keycloak
+note left user: Содержит client_id и code challenge, \nа на стороне Web-приложения сохраняется code verifier
+user -> keycloak: Запрос формы аутентификации
+keycloak --> user: Форма аутентификации
+user -> keycloak: Логин и пароль пользователя
+alt Успешная аутентификация
+keycloak --> user: Редирект на страницу\n Web-приложения(код аутентификации)
+user -> app: Открытие Web-приложения\nс кодом аутентификации
+app -> keycloak: Запрос токенов \nс кодом аутентификации и code verifier
+keycloak -> keycloak: проверка соответствия\nкода аутентификации и code verifier
+keycloak --> app : Токен доступа и refresh токен
+else Некорректный логин или пароль
+end
+
+== Использование и обновление токена доступа ==
+app -> service: Запрос данных с токеном доступа
+alt Валидный токен доступа 
+service --> app: Бизнес-данные
+else Невалидный токен доступа
+service --> app: Ошибка 401
+app -> keycloak: Запрос токена доступа\nс использованием refresh-токена
+keycloak --> app: Токен доступа и refresh токен
+app -> service: Запрос данных с токеном доступа
+service --> app: Бизнес-данные
+end
+
+@enduml
