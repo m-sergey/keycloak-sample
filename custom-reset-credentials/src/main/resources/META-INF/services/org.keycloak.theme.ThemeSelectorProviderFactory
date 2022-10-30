@@ -1,0 +1,2 @@
+me.keycloak.CustomThemeSelectorProviderFactory
+org.keycloak.theme.DefaultThemeSelectorProviderFactory
