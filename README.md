@@ -32,3 +32,8 @@ Open URL in browser:
 ```
 http://localhost:8080/realms/Clients/login-actions/reset-credentials?client_id=accounts&token=<reset-password token>
 ```
+
+## Map user's id in IT systems into claim "ids"
+
+Add attributes for user with prefix "ids." (Tab Attributes)
+
