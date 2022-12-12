@@ -13,7 +13,7 @@ curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/op
 ````
 
 
-## Token exchange
+## Token exchange (for reset-password)
 
 ````
 curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/openid-connect/token' \
@@ -23,6 +23,18 @@ curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/op
 --data-urlencode 'grant_type=urn:ietf:params:oauth:grant-type:token-exchange' \
 --data-urlencode 'subject_token=???' \
 --data-urlencode 'requested_token_type=urn:ietf:params:oauth:token-type:access_token'
+````
+
+## Token exchange (with groups)
+
+````
+curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/openid-connect/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'client_id=account' \
+--data-urlencode 'grant_type=urn:ietf:params:oauth:grant-type:token-exchange' \
+--data-urlencode 'subject_token=???' \
+--data-urlencode 'requested_token_type=urn:ietf:params:oauth:token-type:access_token'
+--data-urlencode 'groups=group1'
 ````
 
 ## Set new password
