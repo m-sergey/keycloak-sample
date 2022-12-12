@@ -1,4 +1,4 @@
-package me.keycloak;
+package me.keycloak.theme;
 
 import org.keycloak.Config;
 import org.keycloak.common.Profile;

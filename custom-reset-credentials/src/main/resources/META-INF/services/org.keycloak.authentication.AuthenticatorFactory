@@ -1,2 +1,2 @@
-me.keycloak.CustomSetCredentialsFactory
-me.keycloak.CustomResetCredentialsFactory
+me.keycloak.authenticator.CustomSetCredentialsFactory
+me.keycloak.authenticator.CustomResetCredentialsFactory

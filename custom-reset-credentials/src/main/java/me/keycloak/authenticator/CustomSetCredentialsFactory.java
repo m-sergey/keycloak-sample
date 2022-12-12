@@ -1,4 +1,4 @@
-package me.keycloak;
+package me.keycloak.authenticator;
 
 import org.keycloak.Config;
 import org.keycloak.authentication.Authenticator;

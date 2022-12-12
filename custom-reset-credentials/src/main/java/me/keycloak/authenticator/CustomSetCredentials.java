@@ -1,4 +1,4 @@
-package me.keycloak;
+package me.keycloak.authenticator;
 
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
@@ -6,12 +6,10 @@ import org.keycloak.authentication.Authenticator;
 import org.keycloak.common.VerificationException;
 import org.keycloak.crypto.SignatureProvider;
 import org.keycloak.crypto.SignatureVerifierContext;
-import org.keycloak.exceptions.TokenSignatureInvalidException;
 import org.keycloak.jose.jws.JWSInput;
 import org.keycloak.jose.jws.JWSInputException;
 import org.keycloak.models.*;
 
-import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.policy.PasswordPolicyManagerProvider;
 import org.keycloak.policy.PolicyError;
 import org.keycloak.representations.JsonWebToken;
