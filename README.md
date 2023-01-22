@@ -71,3 +71,15 @@ Example:
     "confidential-port": 0
 }
 ```
+
+### Build Docker image
+
+```
+>  docker build -t keycloak-web-demo .
+```
+
+### Run web demo app in Docker
+
+```
+> docker run -d --name demo-app -p 8081:80 keycloak-web-demo
+```
