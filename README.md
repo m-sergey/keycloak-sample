@@ -1,7 +1,6 @@
+## Working with Keycloak
 
-
-
-## Get access token
+### Get access token
 
 ````
 curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/openid-connect/token' \
@@ -13,7 +12,7 @@ curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/op
 ````
 
 
-## Token exchange (for reset-password)
+### Token exchange (for reset-password)
 
 ````
 curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/openid-connect/token' \
@@ -25,7 +24,7 @@ curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/op
 --data-urlencode 'requested_token_type=urn:ietf:params:oauth:token-type:access_token'
 ````
 
-## Token exchange (with groups)
+### Token exchange (with groups)
 
 ````
 curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/openid-connect/token' \
@@ -37,7 +36,7 @@ curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/op
 --data-urlencode 'groups=group1'
 ````
 
-## Set new password
+### Set new password
 
 Open URL in browser:
 
@@ -45,7 +44,30 @@ Open URL in browser:
 http://localhost:8080/realms/Clients/login-actions/reset-credentials?client_id=accounts&token=<reset-password token>
 ```
 
-## Map user's id in IT systems into claim "ids"
+### Map user's id in IT systems into claim "ids"
 
 Add attributes for user with prefix "ids." (Tab Attributes)
 
+## Sample web application
+
+### Configuration 
+
+You have to set up your enviroment variables in ___*./web-demo-app/public/keycloak.json*___, where
+
+"realm" - Keycloak realm name
+
+"auth-server-url" - Keycloak base URL
+
+"resource" - client in the selected realm
+
+Example:
+```
+{
+    "realm": "Clients",
+    "auth-server-url": "http://localhost:8080/",
+    "ssl-required": "external",
+    "resource": "webapp",
+    "public-client": true,
+    "confidential-port": 0
+}
+```
