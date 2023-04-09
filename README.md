@@ -1,6 +1,6 @@
 ## Working with Keycloak
 
-### Get access token
+### Get access token with credentials
 
 ````
 curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/openid-connect/token' \
@@ -11,6 +11,15 @@ curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/op
 --data-urlencode 'grant_type=password'
 ````
 
+### Get access token with refresh token
+
+````
+curl --location --request POST 'http://localhost:8080/realms/Clients/protocol/openid-connect/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'client_id=account' \
+--data-urlencode 'grant_type=refresh_token' \
+--data-urlencode 'refresh_token=???'
+````
 
 ### Token exchange (for reset-password)
 
