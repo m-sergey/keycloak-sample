@@ -92,3 +92,11 @@ Example:
 ```
 > docker run -d --name demo-app -p 8081:80 keycloak-web-demo
 ```
+
+### Disable TLS for admin console
+
+```
+# cd /opt/keycloak/bin
+# ./kcadm.sh config credentials --server http://localhost:8080 --realm master --user admin
+# ./kcadm.sh update realms/master -s sslRequired=NONE
+```
